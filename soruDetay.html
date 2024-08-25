@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Soru Detay</title>
+</head>
+
+<body style="background-color: #37423d">
+    <div class="container">
+        <div class="soruDetay">
+            <h2 id="soruBaşlık"></h2>
+
+            <div id="soruŞıklar"></div>
+            <button onclick="geriDon()">Geri Dön</button>
+        </div>
+    </div>
+
+    <script>
+
+        window.onload = function () {
+            const selectedQuestion = JSON.parse(localStorage.getItem('selectedQuestion'));
+            if (selectedQuestion) {
+                document.getElementById('soruBaşlık').innerText = selectedQuestion.question;
+                const şıklarListesi = document.getElementById('soruŞıklar');
+                selectedQuestion.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.classList.add('btn');
+                    button.innerText = ` ${option}`;
+                    şıklarListesi.appendChild(button);
+                });
+            }
+        }
+
+        function geriDon() {
+            window.location.href = 'sorusayfası.html';
+        }
+    </script>
+</body>
+
+</html>
