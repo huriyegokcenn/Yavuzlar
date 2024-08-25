@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+
+<body style="background-color: #37423d">
+    <div class="container">
+        <div class="soru">
+            <input type="text" id="soruAra" placeholder="Soru Ara" style="text-align: center;" oninput="soruAra()">
+
+            <div id="inputContainer" style="display: none;">
+                <input type="text" id="soruGirişi" placeholder="Yeni soru girin" />
+                <input type="text" id="şık1" placeholder="Şık 1" />
+                <input type="text" id="şık2" placeholder="Şık 2" />
+                <input type="text" id="şık3" placeholder="Şık 3" />
+                <input type="text" id="şık4" placeholder="Şık 4" />
+                <button onclick="soruKaydet()" style="justify-content: flex-start">Kaydet</button>
+            </div>
+
+
+
+            <ul class="soruListesi" id="soruListesi"></ul>
+
+
+            <button onclick="geriDon()">Geri Dön</button>
+
+            <button onclick="inputlariGoster()" style="justify-content: flex-start">Soru Ekle</button>
+        </div>
+    </div>
+
+    <script>
+        function geriDon() {
+            window.location.href = 'index.html';
+        }
+
+        function inputlariGoster() {
+            document.getElementById('inputContainer').style.display = 'block';
+        }
+    </script>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
