@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Sonuç Sayfası</title>
+</head>
+<body style="background-color: #37423d">
+    <div class="container">
+        <div class="soruDetay">
+            <h2>Sonuçlarınız</h2>
+            <p id="sonucPuan">Toplam Puan: 0</p>
+            <button onclick="geriDon()">Başa Dön</button>
+        </div>
+    </div>
+
+    <script>
+
+        window.onload = function() {
+            const toplamPuan = localStorage.getItem('toplamPuan') || 0;
+            document.getElementById('sonucPuan').innerText = 'Toplam Puan: ' + toplamPuan;
+        }
+
+        function geriDon() {
+            window.location.href = 'index.html'; 
+        }
+    </script>
+</body>
+</html>

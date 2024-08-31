@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Soru Detay</title>
+</head>
+
+<body style="background-color: #37423d">
+    <div class="container">
+        <div class="soruDetay">
+            <h2 id="soruBaşlık"></h2>
+            <p id =zorlukDerecesi></p>
+            <div id="soruŞıklar"></div>
+            <button onclick="geriDon()">Geri Dön</button>
+            <button id="nextButton" style="display: none;" onclick="sonrakiSoru()">Sonraki Soru</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestionIndex = 0;
+        let toplamPuan = 0;
+    
+        window.onload = function () {
+            currentQuestionIndex = parseInt(localStorage.getItem('selectedQuestionIndex')) || 0;
+            toplamPuan = parseInt(localStorage.getItem('toplamPuan')) || 0;
+            soruGoster(currentQuestionIndex);
+        }
+    
+        function soruGoster(index) {
+            const storedQuestions = JSON.parse(localStorage.getItem('shuffledQuestions')); 
+    
+            if (storedQuestions && index < storedQuestions.length) {
+                const selectedQuestion = storedQuestions[index];
+                document.getElementById('soruBaşlık').innerText = selectedQuestion.question;
+
+                
+    
+                const şıklarListesi = document.getElementById('soruŞıklar');
+                şıklarListesi.innerHTML = '';
+    
+                selectedQuestion.options.forEach((option, i) => {
+                    const button = document.createElement('button');
+                    button.classList.add('btn');
+                    button.innerText = `${option}`;
+                    button.onclick = function () {
+                        handleAnswerClick(button, i, selectedQuestion.correctAnswer);
+                    };
+                    şıklarListesi.appendChild(button);
+                });
+    
+                const nextButton = document.getElementById('nextButton');
+                nextButton.style.display = (index < storedQuestions.length - 1) ? 'inline-block' : 'none';
+            } else {
+                window.location.href = 'sonuc.html';
+            }
+        }
+    
+        function handleAnswerClick(clickedButton, selectedOptionIndex, correctAnswerIndex) {
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => button.disabled = true);
+
+    const storedQuestions = JSON.parse(localStorage.getItem('shuffledQuestions'));
+    const currentQuestion = storedQuestions[currentQuestionIndex];
+    const difficulty = currentQuestion.difficulty;
+
+    let puan = 0;
+    if (selectedOptionIndex === correctAnswerIndex) {
+        clickedButton.style.backgroundColor = 'green';
+
+        if (difficulty === 'kolay') {
+            puan = 5;
+        } else if (difficulty === 'orta') {
+            puan = 10;
+        } else if (difficulty === 'zor') {
+            puan = 15;
+        }
+
+        toplamPuan += puan; // Doğru cevap için puan ekleme kısmoı  bura
+    } else {
+        clickedButton.style.backgroundColor = 'red';
+        buttons[correctAnswerIndex].style.backgroundColor = 'green';
+    }
+
+    localStorage.setItem('toplamPuan', toplamPuan);
+
+    if (currentQuestionIndex >= storedQuestions.length - 1) {
+        setTimeout(() => {
+            window.location.href = 'sonuc.html';
+        }, 1000);
+    }
+}
+
+    
+        function sonrakiSoru() {
+            currentQuestionIndex++;
+            const storedQuestions = JSON.parse(localStorage.getItem('shuffledQuestions')); // Değişiklik yapıldı
+    
+            if (currentQuestionIndex < storedQuestions.length) {
+                localStorage.setItem('selectedQuestionIndex', currentQuestionIndex);
+                soruGoster(currentQuestionIndex);
+            }
+        }
+    
+        function geriDon() {
+            window.location.href = 'sorusayfasi.html';
+        }
+    </script>
+    
+</body>
+
+</html>
