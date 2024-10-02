@@ -1,4 +1,4 @@
-İlk olarak, veritabani_olusutr.php betiğini çalıştırdığımızda, belirtilen /yeni_kalsor/ dizininde quiz.db adında bir veritabanı oluşturulmaktadır.
+XMAPP sunucusundan apache yi çalıştırırız ilk olarak. Sonra veritabani_olusutr.php betiğini çalıştırdığımızda, belirtilen /yeni_kalsor/ dizininde quiz.db adında bir veritabanı oluşturulmaktadır.
 Eğer bu betik başarılı bir şekilde çalışırsa, ekranda "Veriler ve tablolar oluşturuldu" şeklinde bir mesaj görüntülenecektir.
 Bu işlem sonrasında, login.php sayfasına giderek kullanıcı hesaplarımızla giriş yapabiliriz.
 Kullanıcı bilgileri aşağıdaki gibidir:
