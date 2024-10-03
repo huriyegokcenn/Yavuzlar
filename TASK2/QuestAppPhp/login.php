@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['kullanici_adi'] = $kullanici_adi;
 
         if ($kullanici_adi === 'admin') {
-            header('Location: admin_panel.php');
+            header('Location: admin_paneli.php');
             exit();
         } else {
             header('Location: quiz_yarismasi.php');
