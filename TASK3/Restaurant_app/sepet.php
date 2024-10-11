@@ -1,43 +1,65 @@
 <?php
-session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+session_start();
 
+// Veritabanı bağlantısını yapın
 $database_path = "C:/xampp/htdocs/yeni/fooddelivery.db";
 try {
     $connection = new PDO("sqlite:$database_path");
     $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     echo "Veritabanı bağlantı hatası: " . $e->getMessage();
+    exit;
+}
+
+// Kullanıcının sepetindeki yemekleri kontrol et
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = []; // Sepet boşsa başlat
+}
+
+// Yemek sepete ekleme işlemi
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['meal_id'])) {
+    $meal_id = intval($_POST['meal_id']);
+    if (!in_array($meal_id, $_SESSION['cart'])) {
+        $_SESSION['cart'][] = $meal_id; // Yemek sepete ekle
+    }
+    echo "Yemek sepete eklendi!";
+}
+
+// Yemek ID'lerini kullanarak yemek bilgilerini al
+if (!empty($_SESSION['cart'])) {
+    $meal_ids = implode(',', $_SESSION['cart']);
+    $stmt = $connection->prepare("SELECT * FROM meals WHERE id IN ($meal_ids)");
+    $stmt->execute();
+    $meals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    echo "Sepetinizde hiç yemek yok.";
+    exit;
+}
+
+// Sipariş verme işlemi
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['place_order'])) {
+    if (empty($_SESSION['cart'])) {
+        echo "Sepetinizde yemek yok, sipariş veremezsiniz.";
+        exit;
+    }
+
+    $user_id = $_SESSION['user_id']; // Kullanıcı ID'sini oturumdan alın
+
+    foreach ($_SESSION['cart'] as $meal_id) {
+        $stmt = $connection->prepare('INSERT INTO orders (user_id, meal_id) VALUES (:user_id, :meal_id)');
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->bindParam(':meal_id', $meal_id);
+        $stmt->execute();
+    }
+
+    // Sipariş başarılı mesajı
+    $_SESSION['order_placed'] = "Siparişiniz başarıyla alındı!";
+    // Sepeti temizle
+    $_SESSION['cart'] = [];
+    header('Location: index.php');
     exit();
-}
-
-if (isset($_POST['add_to_cart'])) {
-    $meal_id = $_POST['meal_id'];
-    $meal_name = $_POST['meal_name'];
-    $meal_price = (float)$_POST['meal_price']; 
-
-
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
-
-    $_SESSION['cart'][] = [
-        'id' => $meal_id,
-        'name' => $meal_name,
-        'price' => $meal_price
-    ];
-    
-    // Sipariş verildi mesajı
-    echo "<p>Sepete eklendi!</p>";
-}
-
-
-$total_price = 0;
-if (isset($_SESSION['cart'])) {
-    foreach ($_SESSION['cart'] as $item) {
-        $total_price += $item['price'];
-    }
 }
 ?>
 
@@ -47,51 +69,37 @@ if (isset($_SESSION['cart'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sepet</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-        .cart-item:last-child {
-            border-bottom: none;
-        }
-        .total {
-            font-weight: bold;
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="container">
     <h1>Sepetiniz</h1>
 
-    <?php if (isset($_SESSION['cart']) && count($_SESSION['cart']) > 0): ?>
-        <?php foreach ($_SESSION['cart'] as $item): ?>
-            <div class="cart-item">
-                <span><?php echo htmlspecialchars($item['name']); ?></span>
-                <span><?php echo htmlspecialchars($item['price']); ?> TL</span>
-            </div>
-        <?php endforeach; ?>
-        <div class="total">Toplam: <?php echo $total_price; ?> TL</div>
+    <?php if (!empty($meals)): ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Yemek Adı</th>
+                    <th>Fiyat</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($meals as $meal): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($meal['name']) ?></td>
+                        <td><?= htmlspecialchars($meal['price']) ?> TL</td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
+        <form action="sepet.php" method="POST">
+            <button type="submit" name="place_order">Siparişi Ver</button>
+        </form>
     <?php else: ?>
-        <p>Sepetiniz boş.</p>
+        <p>Sepetinizde hiç yemek yok.</p>
     <?php endif; ?>
     
-    <form action="siparis.php" method="POST">
-        <button type="submit" name="siparis_ver">Siparişi Ver</button>
-    </form>
-</div>
+    <a href="index.php">Ana Sayfaya Dön</a>
 </body>
 </html>
+
