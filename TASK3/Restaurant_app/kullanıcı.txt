@@ -1,2 +1,2 @@
-huriye hur
-gokcen gok
+huriye 1234
+gokcen 1234
