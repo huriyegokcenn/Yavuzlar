@@ -17,6 +17,7 @@ $stmt = $connection->prepare("SELECT * FROM meals WHERE id IN ($meal_ids)");
 $stmt->execute();
 $meals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Sipariş gönderim işlemi
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id']; // Kullanıcı ID'sini oturumdan alın
 
